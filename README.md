@@ -135,5 +135,4 @@ Selamat datang di portal PPDB Online MAN 1 Musi Rawas! Kami sangat antusias meny
   - Zaki Atha Maheswara (23106050092)
   - Muhammad Rayyan Afiq El Vann (23106050063)
   
-  Made with ❤️ by MAN 1 Musi Rawas Development Team
 </div>
