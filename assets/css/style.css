@@ -1,0 +1,108 @@
+/* Core styles */
+.navbar {
+    background: #fff;
+}
+
+/* Essential UI Elements */
+.jumbotron {
+    background: url('school-bg.jpg') no-repeat center center;
+    background-size: cover;
+    height: 300px;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    transition: 0.3s;
+}
+
+/* Form Elements */
+.form-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Enhanced CAPTCHA Styling */
+.captcha-code {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    letter-spacing: 8px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 1.3em;
+    padding: 5px 10px;
+    cursor: not-allowed;
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.captcha-code::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(255,255,255,0.1),
+        rgba(255,255,255,0.1) 10px,
+        rgba(0,0,0,0.05) 10px,
+        rgba(0,0,0,0.05) 20px
+    );
+    pointer-events: none;
+}
+
+.captcha-code span {
+    position: relative;
+    z-index: 2;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+}
+
+.captcha-code .noise {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 1px;
+    background: rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Prevent selection on captcha */
+.captcha-code, 
+.captcha-code * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Style for captcha inputs */
+input[name="captcha"] {
+    -webkit-text-security: disc;
+    text-transform: uppercase;
+}
+
+/* Admin Login */
+.login-container {
+    max-width: 400px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+.admin-login-card {
+    border: none;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        width: 95%;
+    }
+}
