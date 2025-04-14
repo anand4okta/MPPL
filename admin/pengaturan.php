@@ -27,13 +27,11 @@ $jalur_list = $stmt->fetchAll();
     
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-3">
-                <div style="position: sticky; top: 80px;">
-                    <?php include 'partials/admin_sidebar.php'; ?>
-                </div>
+            <div class="col-md-3" style="position: sticky; height: calc(100vh - 80px); top: 80px;">
+                <?php include 'partials/admin_sidebar.php'; ?>
             </div>
-            <div class="col-md-9">
-                <h2 class="mb-4" style="margin-top:40px">Pengaturan Sistem</h2>
+            <div class="col-md-9 pt-4">
+                <h2 class="mb-4">Pengaturan Sistem</h2>
                 
                 <!-- Pengaturan Tanggal Jalur Pendaftaran -->
                 <div class="card shadow mb-4">
