@@ -62,11 +62,11 @@ $latest_registrations = $stmt->fetchAll();
     <?php include 'partials/admin_header.php'; ?>
 
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-3" style="position: sticky; height: calc(100vh - 80px); top: 80px;">
+        <div class="row g-0"> <!-- Remove default row gap -->
+            <div class="col-md-2 sidebar-container"> <!-- Reduce column width from 3 to 2 -->
                 <?php include 'partials/admin_sidebar.php'; ?>
             </div>
-            <div class="col-md-9 pt-4">
+            <div class="col-md-10 pt-4"> <!-- Increase from 9 to 10 to match new sidebar width -->
                 <h2 class="mb-3">Dashboard Admin</h2>
                 <!-- Summary Cards -->
                 <div class="row mb-4">
@@ -233,6 +233,21 @@ $latest_registrations = $stmt->fetchAll();
                     @media (min-width: 768px) {
                         .announcement-button-container {
                             margin-left: 4px;
+                        }
+                        .sidebar-container {
+                            position: sticky;
+                            height: calc(100vh - 56px); /* Adjust for typical navbar height */
+                            top: 56px; /* Match navbar height */
+                            z-index: 100; /* Ensure proper stacking */
+                            padding-right: 0; /* Remove right padding */
+                        }
+                    }
+                    @media (max-width: 767px) {
+                        .sidebar-container {
+                            position: relative;
+                            height: auto;
+                            top: 0;
+                            padding: 0; /* Remove padding on mobile */
                         }
                     }
                 </style>
