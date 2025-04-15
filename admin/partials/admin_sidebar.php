@@ -9,7 +9,7 @@ $menu_items = [
     'export_data.php' => ['icon' => 'bi-arrow-left-right', 'text' => 'Export Data']
 ];
 ?>
-<div class="sidebar bg-light p-3">
+<div class="sidebar bg-light p-3 admin-sidebar">
     <div class="list-group">
         <a href="index.php" class="list-group-item list-group-item-action <?= basename($_SERVER['PHP_SELF']) === 'index.php' ? 'active' : '' ?>">
             <i class="bi bi-speedometer2"></i> Dashboard
@@ -34,3 +34,18 @@ $menu_items = [
         </a>
     </div>
 </div>
+<style>
+    .admin-sidebar {
+        position: relative;
+        z-index: 1;
+        margin-top: 20px; /* Add default top margin for mobile */
+    }
+    @media (min-width: 768px) {
+        .admin-sidebar {
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            margin-top: 0; /* Remove margin on desktop */
+        }
+    }
+</style>
