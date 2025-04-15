@@ -32,11 +32,11 @@ $pending_verifications = $stmt->fetchAll();
     <?php include 'partials/admin_header.php'; ?>
     
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-3" style="position: sticky; height: calc(100vh - 80px); top: 80px;">
+        <div class="row g-0">
+            <div class="col-md-2 sidebar-container">
                 <?php include 'partials/admin_sidebar.php'; ?>
             </div>
-            <div class="col-md-9 pt-4">
+            <div class="col-md-10 pt-4">
                 <h2 class="mb-4">Verifikasi Peserta</h2>
                 <div class="card shadow">
                     <div class="card-body">
