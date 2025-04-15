@@ -35,12 +35,12 @@ try {
 <body>
     <?php include '../partials/admin_header.php'; ?>
     
-    <div class="container-fluid my-4">
-        <div class="row">
-            <div class="col-md-3">
-                <div style="position: sticky; top: 80px;">
-                    <?php include '../partials/admin_sidebar.php'; ?>
-                </div>
+    <div class="container-fluid">
+        <div class="row g-0">
+            <div class="col-md-2 sidebar-container">
+                <?php include '../partials/admin_sidebar.php'; ?>
+            </div>
+            <div class="col-md-10 pt-4">
                 <div class="card shadow-sm mb-4 mt-4">
                     <div class="card-body text-center">
                         <?php 
@@ -73,8 +73,7 @@ try {
                         ?>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-9">
+
                 <!-- Section 1: Biodata Siswa -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-primary text-white">
