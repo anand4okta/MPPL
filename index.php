@@ -41,7 +41,7 @@ $query = "SELECT j.*,
 
 // Array untuk menyimpan semua jalur
 $jalur_pendaftaran = [];
-$jalur_order = ['Reguler', 'Prestasi', 'Pondok Pesantren', 'Afirmasi', 'Domisili'];
+$jalur_order = ['Reguler', 'Prestasi', 'Tahfidz', 'Pondok Pesantren', 'Afirmasi', 'Domisili'];
 
 // Ambil data untuk setiap jalur
 foreach ($jalur_order as $nama_jalur) {
