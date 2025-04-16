@@ -74,7 +74,7 @@ $latest_registrations = $stmt->fetchAll();
                         <div class="card border-100 shadow-lg">
                             <div class="card-body text-center">
                                 <div class="circle-icon bg-primary text-white mb-3">
-                                    <i class="bi bi-person-fill-add h3"></i>
+                                    <i class="bi bi-person-add h3"></i>
                                 </div>
                                 <h5 class="card-title">Total Pendaftar</h5>
                                 <h3><?= $summary['total_pendaftar'] ?></h3>
@@ -85,7 +85,7 @@ $latest_registrations = $stmt->fetchAll();
                         <div class="card border-100 shadow-lg">
                             <div class="card-body text-center">
                                 <div class="circle-icon bg-success text-white mb-3">
-                                    <i class="bi bi-person-check-fill h3"></i>
+                                    <i class="bi bi-person-check h3"></i>
                                 </div>
                                 <h5 class="card-title">Terverifikasi</h5>
                                 <h3><?= $summary['total_verified'] ?></h3>
@@ -107,7 +107,7 @@ $latest_registrations = $stmt->fetchAll();
                         <div class="card border-100 shadow-lg">
                             <div class="card-body text-center">
                                 <div class="circle-icon bg-info text-white mb-3">
-                                    <i class="bi bi-check-circle-fill h3"></i>
+                                    <i class="bi bi-check-circle h3"></i>
                                 </div>
                                 <h5 class="card-title">Diterima</h5>
                                 <h3><?= $summary['total_accepted'] ?></h3>
