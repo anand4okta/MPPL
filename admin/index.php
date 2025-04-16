@@ -74,7 +74,7 @@ $latest_registrations = $stmt->fetchAll();
                         <div class="card border-100 shadow-lg">
                             <div class="card-body text-center">
                                 <div class="circle-icon bg-primary text-white mb-3">
-                                    <i class="bi bi-person-plus h3"></i>
+                                    <i class="bi bi-person-fill-add h3"></i>
                                 </div>
                                 <h5 class="card-title">Total Pendaftar</h5>
                                 <h3><?= $summary['total_pendaftar'] ?></h3>
@@ -85,7 +85,7 @@ $latest_registrations = $stmt->fetchAll();
                         <div class="card border-100 shadow-lg">
                             <div class="card-body text-center">
                                 <div class="circle-icon bg-success text-white mb-3">
-                                    <i class="bi bi-check-circle h3"></i>
+                                    <i class="bi bi-person-check-fill h3"></i>
                                 </div>
                                 <h5 class="card-title">Terverifikasi</h5>
                                 <h3><?= $summary['total_verified'] ?></h3>
@@ -107,7 +107,7 @@ $latest_registrations = $stmt->fetchAll();
                         <div class="card border-100 shadow-lg">
                             <div class="card-body text-center">
                                 <div class="circle-icon bg-info text-white mb-3">
-                                    <i class="bi bi-trophy h3"></i>
+                                    <i class="bi bi-check-circle-fill h3"></i>
                                 </div>
                                 <h5 class="card-title">Diterima</h5>
                                 <h3><?= $summary['total_accepted'] ?></h3>
@@ -142,8 +142,8 @@ $latest_registrations = $stmt->fetchAll();
                 <h2 class="mb-4">Berdasarkan Jalur Penerimaan</h2>
                 <div class="row mb-4">
                     <?php 
-                    $colors = ['primary', 'success', 'warning', 'info'];
-                    $icons = ['person-walking', 'trophy', 'star', 'award'];
+                    $colors = ['primary', 'success', 'warning', 'info', 'secondary'];
+                    $icons = ['door-open-fill', 'house-fill', 'houses-fill', 'trophy', 'star', 'award'];
                     $i = 0;
                     foreach($jalur_stats as $jalur): 
                     ?>
