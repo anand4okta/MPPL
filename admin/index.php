@@ -142,8 +142,8 @@ $latest_registrations = $stmt->fetchAll();
                 <h2 class="mb-4">Berdasarkan Jalur Penerimaan</h2>
                 <div class="row mb-4">
                     <?php 
-                    $colors = ['primary', 'success', 'warning', 'info', 'secondary'];
-                    $icons = ['door-open-fill', 'house-fill', 'houses-fill', 'trophy', 'star', 'award'];
+                    $colors = ['primary', 'success', 'warning', 'info', 'secondary', 'danger'];
+                    $icons = ['door-open', 'house', 'houses', 'trophy', 'star', 'book'];
                     $i = 0;
                     foreach($jalur_stats as $jalur): 
                     ?>
