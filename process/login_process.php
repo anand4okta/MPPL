@@ -67,17 +67,17 @@ try {
     // Debug logging
     error_log("Query executed");
     error_log("User data found: " . ($user ? 'Yes' : 'No'));
-    if ($user) {
-        error_log("User status: " . ($user['status'] ?? 'undefined'));
-        error_log("Password in DB: " . substr($user['password'], 0, 10) . '...');
-        error_log("Input password verification result: " . (password_verify($password, $user['password']) ? 'Success' : 'Failed'));
-    }
 
     // Verifikasi user
     if (!$user) {
         incrementLoginAttempt();
-        throw new Exception("NISN atau password salah!");
+        throw new Exception("User tidak ditemukan, silahkan daftar terlebih dahulu!");
     }
+
+    // Debug logging if user exists
+    error_log("User status: " . ($user['status'] ?? 'undefined'));
+    error_log("Password in DB: " . substr($user['password'], 0, 10) . '...');
+    error_log("Input password verification result: " . (password_verify($password, $user['password']) ? 'Success' : 'Failed'));
 
     // Verifikasi password
     if (!password_verify($password, $user['password'])) {
