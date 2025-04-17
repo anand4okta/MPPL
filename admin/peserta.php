@@ -69,6 +69,13 @@ $peserta_list = $stmt->fetchAll();
                                             <a href="profile_siswa.php?id=<?= $peserta['id'] ?>" class="btn btn-sm btn-info">
                                                 <i class="bi bi-eye"></i> Lihat Detail
                                             </a>
+                                            <form action="process/delete_peserta.php" method="POST" class="d-inline" 
+                                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus peserta ini?');">
+                                                <input type="hidden" name="peserta_id" value="<?= $peserta['id'] ?>">
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="bi bi-trash"></i> Hapus
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
