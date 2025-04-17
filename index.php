@@ -362,11 +362,9 @@ unset($_SESSION['error']);
                         <div class="accordion-body">
                             Jalur pendaftaran yang tersedia meliputi:
                             <ul>
-                                <li>Jalur Reguler</li>
-                                <li>Jalur Prestasi</li>
-                                <li>Jalur Pondok Pesantren</li>
-                                <li>Jalur Afirmasi</li>
-                                <li>Jalur Domisili</li>
+                                <?php foreach ($jalur_pendaftaran as $jalur): ?>
+                                <li>Jalur <?= htmlspecialchars($jalur['nama_jalur']) ?></li>
+                                <?php endforeach; ?>
                             </ul>
                             Setiap jalur memiliki persyaratan dan kuota yang berbeda.
                         </div>
