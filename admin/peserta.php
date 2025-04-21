@@ -66,10 +66,10 @@ $peserta_list = $stmt->fetchAll();
                                             <span class="badge bg-<?= $statusClass ?>"><?= htmlspecialchars($status) ?></span>
                                         </td>
                                         <td>
-                                            <a href="profile_siswa.php?id=<?= $peserta['id'] ?>" class="btn btn-sm btn-info">
+                                            <a href="profile_siswa.php?id=<?= $peserta['id'] ?>" class="btn btn-sm btn-info mb-2 mb-md-0">
                                                 <i class="bi bi-eye"></i> Lihat Detail
                                             </a>
-                                            <form action="process/delete_peserta.php" method="POST" class="d-inline" 
+                                            <form action="process/delete_peserta.php" method="POST" class="d-inline-block" 
                                                   onsubmit="return confirm('Apakah Anda yakin ingin menghapus peserta ini?');">
                                                 <input type="hidden" name="peserta_id" value="<?= $peserta['id'] ?>">
                                                 <button type="submit" class="btn btn-sm btn-danger">
