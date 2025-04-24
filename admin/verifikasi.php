@@ -8,15 +8,58 @@ if(empty($_SESSION['admin'])) {
     exit;
 }
 
-$stmt = $pdo->query("SELECT p.*, jp.nama_jalur, v.status_verifikasi 
-    FROM peserta p 
-    LEFT JOIN jalur_pendaftaran jp ON jp.id = p.jalur_id
-    LEFT JOIN verifikasi_peserta v ON p.id = v.peserta_id 
-    WHERE v.status_verifikasi IS NULL 
-       OR v.status_verifikasi = 'Pending'
-       OR v.status_verifikasi = 'rejected'
-    ORDER BY p.created_at DESC");
-$pending_verifications = $stmt->fetchAll();
+try {
+    $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+    
+    $query = "SELECT 
+                p.*, 
+                jp.nama_jalur, 
+                v.status_verifikasi,
+                DATE_FORMAT(p.created_at, '%d/%m/%Y') as tanggal_daftar
+            FROM peserta p 
+            LEFT JOIN jalur_pendaftaran jp ON jp.id = p.jalur_id
+            LEFT JOIN verifikasi_peserta v ON p.id = v.peserta_id 
+            WHERE (
+                v.status_verifikasi IS NULL 
+                OR v.status_verifikasi = 'Pending'
+                OR v.status_verifikasi = 'rejected'
+            )";
+
+    $params = array();
+    if (!empty($search)) {
+        $searchLike = '%' . strtolower($search) . '%';
+        $query .= " AND (
+            LOWER(p.nama_lengkap) LIKE :searchName 
+            OR LOWER(p.nisn) LIKE :searchNisn
+        )";
+        $params[':searchName'] = $searchLike;
+        $params[':searchNisn'] = $searchLike;
+    }
+
+    $query .= " ORDER BY p.created_at DESC";
+    
+    $stmt = $pdo->prepare($query);
+    foreach ($params as $key => $val) {
+        $stmt->bindValue($key, $val);
+    }
+    
+    if (!$stmt->execute()) {
+        throw new PDOException("Failed to execute query");
+    }
+    
+    $pending_verifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Add search result message
+    if (!empty($search)) {
+        $count = count($pending_verifications);
+        $searchMessage = "Ditemukan {$count} hasil pencarian untuk \"{$search}\"";
+    }
+
+} catch (PDOException $e) {
+    error_log("Database error in verifikasi.php: " . $e->getMessage());
+    $_SESSION['error'] = "Terjadi kesalahan saat mencari data";
+    $pending_verifications = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -37,28 +80,51 @@ $pending_verifications = $stmt->fetchAll();
                 <?php include 'partials/admin_sidebar.php'; ?>
             </div>
             <div class="col-md-10 pt-4">
-                <h2 class="mb-4">Verifikasi Peserta</h2>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">Verifikasi Peserta</h2>
+                    <form class="d-flex" role="search" method="GET" style="width: 400px;">
+                        <input class="form-control me-2" type="search" name="search" 
+                               placeholder="Cari nama atau NISN..." value="<?= htmlspecialchars($search) ?>">
+                        <button class="btn btn-outline-primary" type="submit">Cari</button>
+                        <?php if(!empty($search)): ?>
+                            <a href="verifikasi.php" class="btn btn-outline-secondary ms-2">Reset</a>
+                        <?php endif; ?>
+                    </form>
+                </div>
+
+                <?php if(!empty($search)): ?>
+                    <div class="alert alert-info">
+                        <?= $searchMessage ?>
+                    </div>
+                <?php endif; ?>
+
                 <div class="card shadow">
                     <div class="card-body">
+                        <?php if(isset($_SESSION['error'])): ?>
+                            <div class="alert alert-danger">
+                                <?= $_SESSION['error'] ?>
+                            </div>
+                            <?php unset($_SESSION['error']); ?>
+                        <?php endif; ?>
                         <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
                                     <tr>
+                                        <th>No</th>
                                         <th>NISN</th>
                                         <th>Nama</th>
                                         <th>Jalur</th>
-                                        <th>Tanggal Daftar</th>
                                         <th>Status</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach($pending_verifications as $peserta): ?>
+                                    <?php foreach($pending_verifications as $index => $peserta): ?>
                                     <tr>
+                                        <td><?= $index + 1 ?></td>
                                         <td><?= htmlspecialchars($peserta['nisn']) ?></td>
                                         <td><?= htmlspecialchars($peserta['nama_lengkap']) ?></td>
                                         <td><?= htmlspecialchars($peserta['nama_jalur']) ?></td>
-                                        <td><?= date('d/m/Y', strtotime($peserta['created_at'])) ?></td>
                                         <td>
                                             <?php 
                                             $statusClass = 'bg-warning';
