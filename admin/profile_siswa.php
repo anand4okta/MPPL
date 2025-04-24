@@ -255,7 +255,7 @@ try {
                                         <h6>Kartu Keluarga</h6>
                                         <?php if(!empty($peserta['file_kk']) && file_exists("../File/{$folder_name}/{$peserta['file_kk']}")): ?>
                                             <p class="mb-2"><small class="text-muted"><?= htmlspecialchars($peserta['file_kk']) ?></small></p>
-                                            <a href="../File/<?= htmlspecialchars(str_replace(' ', '_', strtolower($peserta['nama_lengkap']))) ?>/<?= htmlspecialchars($peserta['file_kk']) ?>" 
+                                            <a href="download_admin.php?type=kk&id=<?= $peserta['id'] ?>" 
                                                class="btn btn-sm btn-primary" target="_blank">
                                                 <i class="bi bi-download"></i> Download KK
                                             </a>
@@ -271,7 +271,7 @@ try {
                                         <h6>Akte Kelahiran</h6>
                                         <?php if(!empty($peserta['file_akte']) && file_exists("../File/{$folder_name}/{$peserta['file_akte']}")): ?>
                                             <p class="mb-2"><small class="text-muted"><?= htmlspecialchars($peserta['file_akte']) ?></small></p>
-                                            <a href="../File/<?= htmlspecialchars(str_replace(' ', '_', strtolower($peserta['nama_lengkap']))) ?>/<?= htmlspecialchars($peserta['file_akte']) ?>" 
+                                            <a href="download_admin.php?type=akte&id=<?= $peserta['id'] ?>" 
                                                class="btn btn-sm btn-primary" target="_blank">
                                                 <i class="bi bi-download"></i> Download Akte
                                             </a>
@@ -287,7 +287,7 @@ try {
                                         <h6>Pas Foto</h6>
                                         <?php if(!empty($peserta['file_photo']) && file_exists("../File/{$folder_name}/{$peserta['file_photo']}")): ?>
                                             <p class="mb-2"><small class="text-muted"><?= htmlspecialchars($peserta['file_photo']) ?></small></p>
-                                            <a href="../File/<?= htmlspecialchars(str_replace(' ', '_', strtolower($peserta['nama_lengkap']))) ?>/<?= htmlspecialchars($peserta['file_photo']) ?>" 
+                                            <a href="download_admin.php?type=photo&id=<?= $peserta['id'] ?>" 
                                                class="btn btn-sm btn-primary" target="_blank">
                                                 <i class="bi bi-download"></i> Download Foto
                                             </a>
@@ -311,7 +311,7 @@ try {
                                             <h6>Semester <?= $i ?></h6>
                                             <?php if(!empty($peserta[$field_name]) && file_exists("../File/{$folder_name}/{$peserta[$field_name]}")): ?>
                                                 <p class="mb-2"><small class="text-muted"><?= htmlspecialchars($peserta[$field_name]) ?></small></p>
-                                                <a href="../File/<?= htmlspecialchars(str_replace(' ', '_', strtolower($peserta['nama_lengkap']))) ?>/<?= htmlspecialchars($peserta[$field_name]) ?>" 
+                                                <a href="download_admin.php?type=raport&sem=<?= $i ?>&id=<?= $peserta['id'] ?>" 
                                                    class="btn btn-sm btn-primary" target="_blank">
                                                     <i class="bi bi-download"></i> Download
                                                 </a>
