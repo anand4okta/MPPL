@@ -64,8 +64,11 @@ Selamat datang di portal PPDB Online MAN 1 Musi Rawas! Kami sangat antusias meny
 ### 🔍 1. Verifikasi Data Siswa
 1. Login sebagai admin
 2. Buka menu "Data Peserta"
-3. Klik "Lihat Detail" pada siswa
-4. Periksa kelengkapan data:
+3. Gunakan fitur pencarian untuk mencari siswa:
+   - Cari berdasarkan nama
+   - Cari berdasarkan NISN
+4. Klik "Lihat Detail" pada siswa
+5. Periksa kelengkapan data:
    - Biodata
    - Dokumen
    - Prestasi
