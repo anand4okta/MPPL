@@ -8,12 +8,54 @@ if(empty($_SESSION['admin'])) {
     exit;
 }
 
-$stmt = $pdo->query("SELECT p.*, jp.nama_jalur, v.status_verifikasi 
-    FROM peserta p 
-    LEFT JOIN jalur_pendaftaran jp ON jp.id = p.jalur_id
-    LEFT JOIN verifikasi_peserta v ON p.id = v.peserta_id 
-    ORDER BY p.created_at DESC");
-$peserta_list = $stmt->fetchAll();
+try {
+    $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+    // Base query
+    $query = "SELECT p.*, jp.nama_jalur, v.status_verifikasi 
+        FROM peserta p 
+        LEFT JOIN jalur_pendaftaran jp ON jp.id = p.jalur_id
+        LEFT JOIN verifikasi_peserta v ON p.id = v.peserta_id";
+
+    $params = array();
+    if (!empty($search)) {
+        // Handle both name and NISN search
+        $searchLike = '%' . strtolower($search) . '%';
+        $query .= " WHERE LOWER(p.nama_lengkap) LIKE :searchName OR p.nisn LIKE :searchNisn";
+        $params[':searchName'] = $searchLike;
+        $params[':searchNisn'] = $searchLike;
+    }
+
+    $query .= " ORDER BY p.created_at DESC";
+    
+    $stmt = $pdo->prepare($query);
+    foreach ($params as $key => $val) {
+        $stmt->bindValue($key, $val);
+    }
+    
+    if (!$stmt->execute()) {
+        throw new PDOException("Failed to execute query");
+    }
+    
+    $peserta_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Add search result message
+    if (!empty($search)) {
+        $count = count($peserta_list);
+        $searchMessage = "Ditemukan {$count} hasil pencarian untuk \"{$search}\"";
+    }
+
+} catch (PDOException $e) {
+    error_log("Database error in peserta.php: " . $e->getMessage());
+    $_SESSION['error'] = "Terjadi kesalahan saat mencari data. Error: " . $e->getMessage();
+    $peserta_list = [];
+}
+
+// Debug information for development
+if (isset($_SESSION['error'])) {
+    error_log("Search error - Query: " . $query);
+    error_log("Search error - Params: " . print_r($params, true));
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -34,54 +76,87 @@ $peserta_list = $stmt->fetchAll();
                 <?php include 'partials/admin_sidebar.php'; ?>
             </div>
             <div class="col-md-10 pt-4">
-                <h2 class="mb-4">Data Peserta</h2>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">Data Peserta</h2>
+                    <form class="d-flex" role="search" method="GET" style="width: 400px;">
+                        <input class="form-control me-2" type="search" name="search" 
+                               placeholder="Cari nama atau NISN..." value="<?= htmlspecialchars($search) ?>">
+                        <button class="btn btn-outline-primary" type="submit">Cari</button>
+                        <?php if(!empty($search)): ?>
+                            <a href="peserta.php" class="btn btn-outline-secondary ms-2">Reset</a>
+                        <?php endif; ?>
+                    </form>
+                </div>
+
+                <?php if(!empty($search)): ?>
+                    <div class="alert alert-info">
+                        <?= $searchMessage ?>
+                    </div>
+                <?php endif; ?>
+
                 <div class="card shadow">
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>NISN</th>
-                                        <th>Nama</th>
-                                        <th>Jalur</th>
-                                        <th>Status</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach($peserta_list as $peserta): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($peserta['nisn']) ?></td>
-                                        <td><?= htmlspecialchars($peserta['nama_lengkap']) ?></td>
-                                        <td><?= htmlspecialchars($peserta['nama_jalur']) ?></td>
-                                        <td>
-                                            <?php
-                                            $status = $peserta['status_verifikasi'] ?? 'Pending';
-                                            $statusClass = [
-                                                'Pending' => 'warning',
-                                                'Verified' => 'success',
-                                                'Rejected' => 'danger'
-                                            ][$status];
-                                            ?>
-                                            <span class="badge bg-<?= $statusClass ?>"><?= htmlspecialchars($status) ?></span>
-                                        </td>
-                                        <td>
-                                            <a href="profile_siswa.php?id=<?= $peserta['id'] ?>" class="btn btn-sm btn-info mb-2 mb-md-0">
-                                                <i class="bi bi-eye"></i> Lihat Detail
-                                            </a>
-                                            <form action="process/delete_peserta.php" method="POST" class="d-inline-block" 
-                                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus peserta ini?');">
-                                                <input type="hidden" name="peserta_id" value="<?= $peserta['id'] ?>">
-                                                <button type="submit" class="btn btn-sm btn-danger">
-                                                    <i class="bi bi-trash"></i> Hapus
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                        <?php if(isset($_SESSION['error'])): ?>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <?= $_SESSION['error']; ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                <?php unset($_SESSION['error']); ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if(empty($peserta_list)): ?>
+                            <div class="alert alert-warning">
+                                <?= empty($search) ? 'Tidak ada data peserta.' : 'Tidak ada hasil pencarian untuk "'.htmlspecialchars($search).'"' ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>NISN</th>
+                                            <th>Nama</th>
+                                            <th>Jalur</th>
+                                            <th>Status</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach($peserta_list as $index => $peserta): ?>
+                                        <tr>
+                                            <td><?= $index + 1 ?></td>
+                                            <td><?= htmlspecialchars($peserta['nisn']) ?></td>
+                                            <td><?= htmlspecialchars($peserta['nama_lengkap']) ?></td>
+                                            <td><?= htmlspecialchars($peserta['nama_jalur']) ?></td>
+                                            <td>
+                                                <?php
+                                                $status = $peserta['status_verifikasi'] ?? 'Pending';
+                                                $statusClass = [
+                                                    'Pending' => 'warning',
+                                                    'Verified' => 'success',
+                                                    'Rejected' => 'danger'
+                                                ][$status];
+                                                ?>
+                                                <span class="badge bg-<?= $statusClass ?>"><?= htmlspecialchars($status) ?></span>
+                                            </td>
+                                            <td>
+                                                <a href="profile_siswa.php?id=<?= $peserta['id'] ?>" class="btn btn-sm btn-info mb-2 mb-md-0">
+                                                    <i class="bi bi-eye"></i> Lihat Detail
+                                                </a>
+                                                <form action="process/delete_peserta.php" method="POST" class="d-inline-block" 
+                                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus peserta ini?');">
+                                                    <input type="hidden" name="peserta_id" value="<?= $peserta['id'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="bi bi-trash"></i> Hapus
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
