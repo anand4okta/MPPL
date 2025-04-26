@@ -143,6 +143,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             z-index: 1030;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <!-- Navbar -->
@@ -617,106 +618,97 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </form>
 
                         <script>
-                        async function deleteDocument(documentType) {
-                            if(!confirm('Apakah Anda yakin ingin menghapus file ini?')) {
-                                return;
-                            }
+                        async function confirmDelete(e) {
+                            e.preventDefault();
+                            const result = await Swal.fire({
+                                title: 'Hapus Prestasi',
+                                text: 'Apakah Anda yakin ingin menghapus prestasi ini?',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#d33',
+                                cancelButtonColor: '#3085d6',
+                                confirmButtonText: 'Ya, Hapus!',
+                                cancelButtonText: 'Batal'
+                            });
 
-                            try {
-                                const formData = new FormData();
-                                formData.append('document_type', documentType);
-                                
-                                const response = await fetch('process/delete_document.php', {
-                                    method: 'POST',
-                                    body: formData
-                                });
-                                
-                                const result = await response.json();
-                                if(result.success) {
-                                    alert('File berhasil dihapus');
-                                    location.reload();
-                                } else {
-                                    throw new Error(result.error || 'Gagal menghapus file');
-                                }
-                            } catch(error) {
-                                console.error('Error:', error);
-                                alert(error.message || 'Terjadi kesalahan saat menghapus file');
+                            if (result.isConfirmed) {
+                                const form = e.target;
+                                form.submit();
                             }
+                            return false;
                         }
-
+                        // Ganti bagian script upload dengan yang lebih sederhana
                         const uploadForm = document.getElementById('uploadForm');
                         if (uploadForm) {
-                            uploadForm.onsubmit = async function(e) {
+                            uploadForm.addEventListener('submit', function(e) {
                                 e.preventDefault();
                                 
-                                const submitBtn = document.getElementById('submitBtn');
-                                const uploadStatus = document.getElementById('uploadStatus');
-                                submitBtn.disabled = true;
-                                uploadStatus.style.display = 'block';
+                                // Validasi ukuran file
+                                const files = document.querySelectorAll('.file-upload');
+                                let isValid = true;
+                                
+                                files.forEach(input => {
+                                    if (input.files.length > 0) {
+                                        const file = input.files[0];
+                                        if (file.size > 5 * 1024 * 1024) {
+                                            alert(`File ${file.name} melebihi batas maksimal 5MB`);
+                                            isValid = false;
+                                        }
+                                    }
+                                });
 
-                                try {
-                                    const formData = new FormData(this);
-                                    
-                                    const response = await fetch('process/upload_handler.php', {
-                                        method: 'POST',
-                                        body: formData
-                                    });
+                                if (!isValid) return;
 
-                                    const result = await response.json();
-                                    console.log('Upload response:', result); // Debug response
-
+                                const formData = new FormData(uploadForm);
+                                
+                                fetch('process/upload_handler.php', {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(response => response.json())
+                                .then(result => {
                                     if (result.success) {
-                                        alert(result.message || 'Data berhasil disimpan');
-                                        window.location.href = 'profile.php'; // Redirect ke profile setelah berhasil
+                                        // Show success alert first
+                                        await Swal.fire({
+                                            icon: 'success',
+                                            title: 'Berhasil!',
+                                            text: 'Data berhasil disimpan',
+                                            confirmButtonColor: '#28a745',
+                                            timer: 2000,
+                                            timerProgressBar: true,
+                                            showConfirmButton: false,
+                                            didOpen: () => {
+                                                Swal.showLoading();
+                                            }
+                                        });
+                                        
+                                        // Add extra delay before redirect
+                                        await new Promise(resolve => setTimeout(resolve, 500));
+                                        window.location.href = 'profile.php';
                                     } else {
                                         throw new Error(result.message || 'Gagal menyimpan data');
                                     }
-
-                                } catch (error) {
-                                    console.error('Upload error:', error);
-                                    alert('Terjadi kesalahan: ' + error.message);
-                                } finally {
-                                    submitBtn.disabled = false;
-                                    uploadStatus.style.display = 'none';
-                                }
-                            };
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    // Show error alert
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        text: error.message || 'Terjadi kesalahan saat menyimpan data',
+                                        confirmButtonColor: '#dc3545'
+                                    });
+                                });
+                            });
                         }
 
-                        // File validation and compression preview
-                        document.querySelectorAll('.file-upload').forEach(input => {
-                            input.addEventListener('change', async function() {
-                                if(this.files.length > 0) {
-                                    const file = this.files[0];
-                                    const maxSize = 5 * 1024 * 1024; // 5MB
-                                    const isPhoto = this.name === 'file_photo';
-                                    
-                                    if(file.size > maxSize) {
-                                        if(isPhoto) {
-                                            const compressed = await compressImage(file);
-                                            if(compressed.size <= maxSize) {
-                                                const container = new DataTransfer();
-                                                container.items.add(compressed);
-                                                this.files = container.files;
-                                                return;
-                                            }
-                                        }
-                                        alert('Ukuran file maksimal 5MB');
-                                        this.value = '';
-                                        return;
-                                    }
-
-                                    const validPhotoTypes = ['image/jpeg', 'image/png'];
-                                    const validDocTypes = ['application/pdf'];
-                                    
-                                    if(isPhoto && !validPhotoTypes.includes(file.type)) {
-                                        alert('Foto harus berformat JPG atau PNG');
-                                        this.value = '';
-                                    } else if(!isPhoto && !validDocTypes.includes(file.type)) {
-                                        alert('Dokumen harus berformat PDF');
-                                        this.value = '';
-                                    }
-                                }
-                            });
+                        // Cek parameter success sekali saja saat load
+                        window.addEventListener('load', function() {
+                            const urlParams = new URLSearchParams(window.location.search);
+                            if (urlParams.has('success')) {
+                                alert('Data berhasil disimpan');
+                                history.replaceState(null, '', 'dashboard.php');
+                            }
                         });
                         </script>
                     </div>
@@ -729,7 +721,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <h4 class="mb-0"><i class="bi bi-trophy"></i> Prestasi</h4>
                     </div>
                     <div class="card-body">
-                        <form method="post" class="mb-4">
+                        <form method="post" class="mb-4" onsubmit="return handleAddPrestasi(event)">
                             <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                             <input type="hidden" name="add_prestasi" value="1">
                             
@@ -774,12 +766,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 Tingkat: <?= htmlspecialchars($p['tingkat']) ?>
                                             </small>
                                         </div>
-                                        <form method="post" style="display:inline">
+                                        <form method="post" style="display: inline;">
                                             <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                                             <input type="hidden" name="delete_prestasi" value="1">
                                             <input type="hidden" name="prestasi_id" value="<?= $p['id'] ?>">
-                                            <button type="submit" class="btn btn-danger btn-sm" 
-                                                    onclick="return confirm('Hapus prestasi ini?')">
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(this)">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -794,6 +785,60 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <!-- Add this script before closing body tag -->
+    <script>
+    // Existing delete confirmation function
+    function confirmDelete(button) {
+        Swal.fire({
+            title: 'Hapus Prestasi?',
+            text: 'Prestasi yang dihapus tidak dapat dikembalikan',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = button.closest('form');
+                form.submit();
+            }
+        });
+    }
+
+    // Add new function for handling prestasi submission
+    function handleAddPrestasi(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Prestasi berhasil ditambahkan',
+                timer: 1500,
+                showConfirmButton: false,
+                timerProgressBar: true
+            }).then(() => {
+                window.location.reload();
+            });
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Gagal menambahkan prestasi'
+            });
+        });
+
+        return false;
+    }
+    </script>
     <!-- Footer -->
     <footer class="bg-dark text-white py-4">
         <div class="container">
@@ -860,14 +905,35 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert('Data berhasil disimpan');
-                    window.location.href = 'profile.php'; // Redirect ke profile setelah berhasil
+                    // Show success alert first
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Data berhasil disimpan',
+                        confirmButtonColor: '#28a745',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Add extra delay before redirect
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    window.location.href = 'profile.php';
                 } else {
                     throw new Error(result.message || 'Gagal menyimpan data');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan: ' + error.message);
+                // Show error alert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: error.message || 'Terjadi kesalahan saat menyimpan data',
+                    confirmButtonColor: '#dc3545'
+                });
             } finally {
                 submitBtn.disabled = false;
                 uploadStatus.style.display = 'none';
