@@ -68,6 +68,7 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <?php include 'partials/admin_header.php'; ?>
@@ -148,12 +149,12 @@ try {
                                             <div class="btn-group">
                                                 <a href="process/process_pengumuman.php?id=<?= $peserta['id'] ?>&status=diterima" 
                                                    class="btn btn-sm btn-success"
-                                                   onclick="return confirm('Yakin ingin menerima peserta ini?')">
+                                                   onclick="return confirmStatus(event, 'terima')">
                                                     <i class="bi bi-check-circle"></i> Terima
                                                 </a>
                                                 <a href="process/process_pengumuman.php?id=<?= $peserta['id'] ?>&status=ditolak" 
                                                    class="btn btn-sm btn-danger"
-                                                   onclick="return confirm('Yakin ingin menolak peserta ini?')">
+                                                   onclick="return confirmStatus(event, 'tolak')">
                                                     <i class="bi bi-x-circle"></i> Tolak
                                                 </a>
                                             </div>
@@ -170,5 +171,47 @@ try {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+async function confirmStatus(e, action) {
+    e.preventDefault();
+    
+    const result = await Swal.fire({
+        title: `${action === 'terima' ? 'Terima' : 'Tolak'} Peserta?`,
+        text: `Yakin ingin ${action === 'terima' ? 'menerima' : 'menolak'} peserta ini?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: action === 'terima' ? '#28a745' : '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: `Ya, ${action === 'terima' ? 'Terima' : 'Tolak'}!`,
+        cancelButtonText: 'Batal'
+    });
+
+    if (result.isConfirmed) {
+        window.location.href = e.target.href;
+    }
+    return false;
+}
+
+// Replace existing alerts with SweetAlert
+window.addEventListener('load', function() {
+    <?php if(isset($_SESSION['success'])): ?>
+        Swal.fire({
+            title: 'Berhasil!',
+            text: '<?= $_SESSION['success'] ?>',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+        });
+    <?php unset($_SESSION['success']); endif; ?>
+
+    <?php if(isset($_SESSION['error'])): ?>
+        Swal.fire({
+            title: 'Error!',
+            text: '<?= $_SESSION['error'] ?>',
+            icon: 'error'
+        });
+    <?php unset($_SESSION['error']); endif; ?>
+});
+</script>
 </body>
 </html>
