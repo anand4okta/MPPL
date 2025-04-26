@@ -67,19 +67,24 @@ Selamat datang di portal PPDB Online MAN 1 Musi Rawas! Kami sangat antusias meny
 3. Gunakan fitur pencarian untuk mencari siswa:
    - Cari berdasarkan nama
    - Cari berdasarkan NISN
+   - Sistem akan menampilkan peringatan jika ada nama yang mirip
 4. Klik "Lihat Detail" pada siswa
 5. Periksa kelengkapan data:
-   - Biodata
-   - Dokumen
-   - Prestasi
+   - Biodata siswa dan orangtua
+   - Dokumen (KK, Akte, Foto, Raport)
+   - Prestasi (jika ada)
 
 ### 📏 2. Input Jarak & Verifikasi
 1. Buka menu "Verifikasi"
-2. Input jarak siswa ke sekolah
+2. Input jarak siswa ke sekolah (dalam kilometer)
 3. Pilih status verifikasi:
-   - Verified
-   - Rejected
-4. Tambahkan catatan jika perlu
+   - Verified (memungkinkan input status penerimaan)
+   - Pending (menunggu kelengkapan)
+   - Rejected (ditolak dengan catatan)
+4. Jika status Verified, bisa langsung input status penerimaan:
+   - Diterima
+   - Ditolak
+5. Tambahkan catatan verifikasi jika perlu
 
 ### ⚙️ 3. Pengaturan Sistem
 1. **Jalur Pendaftaran**
@@ -108,8 +113,10 @@ Selamat datang di portal PPDB Online MAN 1 Musi Rawas! Kami sangat antusias meny
 
 ### Untuk Admin
 - 📊 Statistik jumlah pendaftar
-- 📝 Verifikasi berkas pendaftar
-- 📈 Status pendaftaran
+- 📝 Verifikasi berkas pendaftar dengan validasi ganda
+- 🔍 Deteksi nama mirip untuk menghindari pendaftaran ganda
+- 📈 Status pendaftaran (Pending/Verified/Rejected)
+- 🎯 Status penerimaan terintegrasi dengan verifikasi
 - 📩 Export data ke Excel
 - ⚡ Manajemen pengumuman
 
