@@ -112,6 +112,7 @@ if (isset($_SESSION['error'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <?php include 'partials/admin_header.php'; ?>
@@ -201,7 +202,7 @@ if (isset($_SESSION['error'])) {
                                                     <i class="bi bi-eye"></i> Lihat Detail
                                                 </a>
                                                 <form action="process/delete_peserta.php" method="POST" class="d-inline-block" 
-                                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus peserta ini?');">
+                                                      onsubmit="return confirmDelete(event)">
                                                     <input type="hidden" name="peserta_id" value="<?= $peserta['id'] ?>">
                                                     <button type="submit" class="btn btn-sm btn-danger">
                                                         <i class="bi bi-trash"></i> Hapus
@@ -221,5 +222,45 @@ if (isset($_SESSION['error'])) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+async function confirmDelete(e) {
+    e.preventDefault();
+    const result = await Swal.fire({
+        title: 'Hapus Peserta?',
+        text: 'Data peserta yang dihapus tidak dapat dikembalikan',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    });
+
+    if (result.isConfirmed) {
+        e.target.submit();
+    }
+}
+
+// Replace existing alerts with SweetAlert
+window.addEventListener('load', function() {
+    <?php if(isset($_SESSION['success'])): ?>
+        Swal.fire({
+            title: 'Berhasil!',
+            text: '<?= $_SESSION['success'] ?>',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+        });
+    <?php unset($_SESSION['success']); endif; ?>
+
+    <?php if(isset($_SESSION['error'])): ?>
+        Swal.fire({
+            title: 'Error!',
+            text: '<?= $_SESSION['error'] ?>',
+            icon: 'error'
+        });
+    <?php unset($_SESSION['error']); endif; ?>
+});
+</script>
 </body>
 </html>
