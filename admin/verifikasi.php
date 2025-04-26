@@ -80,6 +80,7 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <?php include 'partials/admin_header.php'; ?>
@@ -236,6 +237,66 @@ try {
                 pengumumanStatus.style.display = 'none';
             }
         }
+
+        document.querySelectorAll('form[action="process/verifikasi_process.php"]').forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const modal = bootstrap.Modal.getInstance(form.closest('.modal'));
+
+                try {
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (modal) modal.hide();
+
+                    await Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Status verifikasi berhasil diperbarui',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
+                    window.location.href = 'verifikasi.php';
+
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat memproses verifikasi',
+                        icon: 'error'
+                    });
+                }
+            });
+        });
+
+        // Replace URL parameter check with SweetAlert
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.has('success')) {
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: 'Status verifikasi berhasil diperbarui',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = 'verifikasi.php';
+                });
+            } else if (urlParams.has('error')) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan saat memproses verifikasi',
+                    icon: 'error'
+                }).then(() => {
+                    window.location.href = 'verifikasi.php';
+                });
+            }
+        });
     </script>
 </body>
 </html>
