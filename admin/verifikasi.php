@@ -11,27 +11,31 @@ if(empty($_SESSION['admin'])) {
 try {
     $search = isset($_GET['search']) ? trim($_GET['search']) : '';
     
+    // Base query dengan error handling yang lebih baik
     $query = "SELECT 
-                p.*, 
+                p.id,
+                p.nisn,
+                p.nama_lengkap,
+                p.created_at,
                 jp.nama_jalur, 
                 v.status_verifikasi,
                 DATE_FORMAT(p.created_at, '%d/%m/%Y') as tanggal_daftar
             FROM peserta p 
             LEFT JOIN jalur_pendaftaran jp ON jp.id = p.jalur_id
             LEFT JOIN verifikasi_peserta v ON p.id = v.peserta_id 
-            WHERE (
-                v.status_verifikasi IS NULL 
-                OR v.status_verifikasi = 'Pending'
-                OR v.status_verifikasi = 'rejected'
-            )";
+            WHERE 1=1";
 
     $params = array();
+
+    // Tambahkan filter status
+    $query .= " AND (v.status_verifikasi IS NULL 
+                OR v.status_verifikasi = 'Pending'
+                OR v.status_verifikasi = 'rejected')";
+
     if (!empty($search)) {
         $searchLike = '%' . strtolower($search) . '%';
-        $query .= " AND (
-            LOWER(p.nama_lengkap) LIKE :searchName 
-            OR LOWER(p.nisn) LIKE :searchNisn
-        )";
+        $query .= " AND (LOWER(p.nama_lengkap) LIKE :searchName 
+                        OR p.nisn LIKE :searchNisn)";
         $params[':searchName'] = $searchLike;
         $params[':searchNisn'] = $searchLike;
     }
@@ -39,15 +43,21 @@ try {
     $query .= " ORDER BY p.created_at DESC";
     
     $stmt = $pdo->prepare($query);
+    
+    // Bind parameters dengan pengecekan
     foreach ($params as $key => $val) {
         $stmt->bindValue($key, $val);
     }
     
     if (!$stmt->execute()) {
-        throw new PDOException("Failed to execute query");
+        throw new PDOException("Failed to execute query: " . implode(" ", $stmt->errorInfo()));
     }
     
     $pending_verifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    if ($pending_verifications === false) {
+        throw new PDOException("Failed to fetch results");
+    }
     
     // Add search result message
     if (!empty($search)) {
@@ -57,7 +67,7 @@ try {
 
 } catch (PDOException $e) {
     error_log("Database error in verifikasi.php: " . $e->getMessage());
-    $_SESSION['error'] = "Terjadi kesalahan saat mencari data";
+    $_SESSION['error'] = "Terjadi kesalahan saat mengambil data. Silakan coba lagi.";
     $pending_verifications = [];
 }
 ?>
