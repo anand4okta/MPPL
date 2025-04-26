@@ -3,6 +3,10 @@ require_once '../config/db.php';
 require_once '../includes/admin_auth.php';
 
 try {
+    if (!isset($_GET['id']) || empty($_GET['id'])) {
+        throw new Exception("ID peserta tidak valid");
+    }
+
     // Get peserta data with prestasi
     $stmt = $pdo->prepare("
         SELECT p.*, j.nama_jalur 
@@ -13,13 +17,25 @@ try {
     $stmt->execute([$_GET['id']]);
     $peserta = $stmt->fetch();
 
-    // Get prestasi
+    if (!$peserta) {
+        throw new Exception("Data peserta tidak ditemukan");
+    }
+
+    // Gunakan format folder yang konsisten
+    $folder_name = str_replace(' ', '_', strtolower($peserta['nama_lengkap']));
+
+    // Get prestasi dengan error handling
     $stmt = $pdo->prepare("SELECT * FROM prestasi WHERE peserta_id = ? ORDER BY created_at DESC");
     $stmt->execute([$_GET['id']]);
     $prestasi = $stmt->fetchAll();
+
 } catch(PDOException $e) {
-    error_log("Database Error: ".$e->getMessage());
-    $_SESSION['error'] = "Terjadi kesalahan sistem";
+    error_log("Database Error in profile_siswa.php: ".$e->getMessage());
+    $_SESSION['error'] = "Terjadi kesalahan sistem saat mengambil data";
+    header("Location: peserta.php");
+    exit;
+} catch(Exception $e) {
+    $_SESSION['error'] = $e->getMessage();
     header("Location: peserta.php");
     exit;
 }
@@ -44,15 +60,14 @@ try {
                 <div class="card shadow-sm mb-4 mt-4">
                     <div class="card-body text-center">
                         <?php 
-                        $folder_name = str_replace(' ', '_', strtolower($peserta['nama_lengkap']));
-                        $photo_path = "../File/{$folder_name}/{$peserta['file_photo']}";
-                        
-                        if(!empty($peserta['file_photo']) && file_exists($photo_path)): ?>
-                            <img src="<?= htmlspecialchars($photo_path) ?>" 
+                        // Pada bagian profil foto
+                        if(!empty($peserta['file_photo']) && file_exists("../File/{$folder_name}/{$peserta['file_photo']}")): ?>
+                            <img src="<?= "../File/{$folder_name}/{$peserta['file_photo']}" ?>" 
                                  class="img-thumbnail mb-3" 
                                  style="max-width: 200px;" 
                                  alt="Foto Peserta"
                                  onerror="this.src='../assets/img/default-profile.png';">
+
                         <?php else: ?>
                             <i class="bi bi-person-circle text-secondary mb-2" style="font-size: 150px;"></i>
                             <p class="text-muted small">Belum upload foto</p>
