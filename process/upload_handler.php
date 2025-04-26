@@ -93,6 +93,14 @@ try {
             // Generate filename
             $new_filename = getFormattedFileName($file['name'], $file_field, $current_data['nama_lengkap']);
             
+            if ($file['size'] > 5 * 1024 * 1024) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Ukuran file ' . $file['name'] . ' melebihi batas maksimal 5MB'
+                ]);
+                exit;
+            }
+
             if (move_uploaded_file($file['tmp_name'], $upload_dir . $new_filename)) {
                 chmod($upload_dir . $new_filename, 0644);
                 $files_to_update[$file_field] = $new_filename; // Store just filename
