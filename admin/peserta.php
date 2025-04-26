@@ -38,6 +38,52 @@ try {
     }
     
     $peserta_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Cek nama yang mirip
+    $similar_names = [];
+    $name_count = [];
+    $checked_pairs = []; // Untuk mencegah pengecekan ganda
+
+    foreach ($peserta_list as $peserta) {
+        $nama = strtolower($peserta['nama_lengkap']);
+        $name_count[$nama] = isset($name_count[$nama]) ? $name_count[$nama] + 1 : 1;
+        
+        // Cek kemiripan dengan nama lain
+        foreach ($peserta_list as $other) {
+            if ($peserta['id'] !== $other['id']) {
+                $other_nama = strtolower($other['nama_lengkap']);
+                
+                // Buat unique pair key untuk mencegah pengecekan ganda
+                $pair_key = $nama < $other_nama ? 
+                           $nama . '|||' . $other_nama : 
+                           $other_nama . '|||' . $nama;
+                
+                if (!isset($checked_pairs[$pair_key])) {
+                    similar_text($nama, $other_nama, $percent);
+                    if ($percent > 80) {
+                        $similar_names[] = [
+                            'nama1' => ucwords($nama),
+                            'nama2' => ucwords($other_nama)
+                        ];
+                    }
+                    $checked_pairs[$pair_key] = true;
+                }
+            }
+        }
+    }
+
+    // Siapkan pesan peringatan untuk nama yang mirip
+    $warning_messages = [];
+    foreach ($similar_names as $pair) {
+        $warning_messages[] = "Nama yang mirip terdeteksi: {$pair['nama1']} dengan {$pair['nama2']}";
+    }
+
+    // Pesan untuk nama yang sama persis
+    foreach ($name_count as $name => $count) {
+        if ($count > 1) {
+            $warning_messages[] = "Terdapat " . $count . " peserta dengan nama yang sama: " . ucwords($name);
+        }
+    }
     
     // Add search result message
     if (!empty($search)) {
@@ -91,6 +137,17 @@ if (isset($_SESSION['error'])) {
                 <?php if(!empty($search)): ?>
                     <div class="alert alert-info">
                         <?= $searchMessage ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if(!empty($warning_messages)): ?>
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Perhatian!</h6>
+                        <ul class="mb-0">
+                            <?php foreach($warning_messages as $message): ?>
+                                <li><?= $message ?></li>
+                            <?php endforeach; ?>
+                        </ul>
                     </div>
                 <?php endif; ?>
 
