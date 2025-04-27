@@ -71,9 +71,10 @@ Selamat datang di portal PPDB Online MAN 1 Musi Rawas! Kami sangat antusias meny
    - Cari berdasarkan nama
    - Cari berdasarkan NISN
 4. Pengurutan data otomatis:
-   - Siswa terverifikasi ditampilkan paling atas
-   - Diikuti status pending dan ditolak
-   - Berdasarkan urutan pendaftaran (terlama ke terbaru)
+   - Data terverifikasi (Verified) ditampilkan paling atas, diurutkan dari terbaru ke lama
+   - Data pending dan ditolak diurutkan dari terbaru ke lama  
+   - Prioritas status: Verified > Pending > Rejected
+   - Sistem ini memudahkan admin memantau pendaftar-pendaftar baru
 
 ### 📏 2. Verifikasi & Catatan
 1. Klik tombol "Verifikasi" atau "Edit"
