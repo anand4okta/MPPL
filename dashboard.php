@@ -967,30 +967,42 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     if(file.size > maxSize) {
                         if(isPhoto) {
-                            // For photos, try to compress instead of rejecting
                             const compressed = await compressImage(file);
                             if(compressed.size <= maxSize) {
-                                // Replace the file in the input
                                 const container = new DataTransfer();
                                 container.items.add(compressed);
                                 this.files = container.files;
                                 return;
                             }
                         }
-                        alert('Ukuran file maksimal 5MB');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'File Terlalu Besar',
+                            text: 'Ukuran file maksimal 5MB',
+                            confirmButtonColor: '#d33'
+                        });
                         this.value = '';
                         return;
                     }
 
-                    // Validate file types
                     const validPhotoTypes = ['image/jpeg', 'image/png'];
                     const validDocTypes = ['application/pdf'];
                     
                     if(isPhoto && !validPhotoTypes.includes(file.type)) {
-                        alert('Foto harus berformat JPG atau PNG');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Format File Salah',
+                            text: 'Foto harus berformat JPG atau PNG',
+                            confirmButtonColor: '#d33'
+                        });
                         this.value = '';
                     } else if(!isPhoto && !validDocTypes.includes(file.type)) {
-                        alert('Dokumen harus berformat PDF');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Format File Salah', 
+                            text: 'Dokumen harus berformat PDF',
+                            confirmButtonColor: '#d33'
+                        });
                         this.value = '';
                     }
                 }
