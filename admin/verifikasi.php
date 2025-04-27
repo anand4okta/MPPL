@@ -17,8 +17,10 @@ try {
                 p.nisn,
                 p.nama_lengkap,
                 p.created_at,
+                p.jarak_ke_sekolah,
                 jp.nama_jalur, 
                 v.status_verifikasi,
+                v.catatan,
                 DATE_FORMAT(p.created_at, '%d/%m/%Y') as tanggal_daftar
             FROM peserta p 
             LEFT JOIN jalur_pendaftaran jp ON jp.id = p.jalur_id
@@ -27,11 +29,8 @@ try {
 
     $params = array();
 
-    // Tambahkan filter status
-    $query .= " AND (v.status_verifikasi IS NULL 
-                OR v.status_verifikasi = 'Pending'
-                OR v.status_verifikasi = 'rejected')";
-
+    // Remove the filter that excludes verified students
+    // Instead, just keep search filter if it exists
     if (!empty($search)) {
         $searchLike = '%' . strtolower($search) . '%';
         $query .= " AND (LOWER(p.nama_lengkap) LIKE :searchName 
@@ -40,7 +39,15 @@ try {
         $params[':searchNisn'] = $searchLike;
     }
 
-    $query .= " ORDER BY p.created_at DESC";
+    // Update the ORDER BY clause to show verified first, then order by registration date
+    $query .= " ORDER BY 
+                CASE 
+                    WHEN v.status_verifikasi = 'Verified' THEN 1 
+                    WHEN v.status_verifikasi = 'Pending' THEN 2
+                    WHEN v.status_verifikasi = 'rejected' THEN 3
+                    ELSE 4 
+                END,
+                p.created_at ASC"; // Changed to ASC to show earliest registrations first
     
     $stmt = $pdo->prepare($query);
     
@@ -126,6 +133,7 @@ try {
                                         <th>Nama</th>
                                         <th>Jalur</th>
                                         <th>Status</th>
+                                        <th>Catatan</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -141,7 +149,10 @@ try {
                                             $statusClass = 'bg-warning';
                                             $statusText = 'Pending';
                                             
-                                            if ($peserta['status_verifikasi'] === null) {
+                                            if ($peserta['status_verifikasi'] === 'Verified') {
+                                                $statusClass = 'bg-success';
+                                                $statusText = 'Terverifikasi';
+                                            } elseif ($peserta['status_verifikasi'] === null) {
                                                 $statusClass = 'bg-secondary';
                                                 $statusText = 'Belum Diverifikasi';
                                             } elseif ($peserta['status_verifikasi'] === 'rejected') {
@@ -153,11 +164,16 @@ try {
                                                 <?= $statusText ?>
                                             </span>
                                         </td>
+                                        <td><?= !empty($peserta['catatan']) ? 
+                                            '<span class="text-warning"><i class="bi bi-exclamation-triangle"></i> ' . 
+                                            htmlspecialchars($peserta['catatan']) . '</span>' : 
+                                            '-' ?></td>
                                         <td>
-                                            <button type="button" class="btn btn-sm btn-primary" 
+                                            <button type="button" class="btn btn-sm <?= $peserta['status_verifikasi'] === 'Verified' ? 'btn-warning' : 'btn-primary' ?>" 
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#verifikasiModal<?= $peserta['id'] ?>">
-                                                <i class="bi bi-check-circle"></i> Verifikasi
+                                                <i class="bi <?= $peserta['status_verifikasi'] === 'Verified' ? 'bi-pencil-square' : 'bi-check-circle' ?>"></i>
+                                                <?= $peserta['status_verifikasi'] === 'Verified' ? 'Edit' : 'Verifikasi' ?>
                                             </button>
 
                                             <!-- Modal Verifikasi -->
@@ -165,7 +181,9 @@ try {
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Verifikasi Peserta</h5>
+                                                            <h5 class="modal-title">
+                                                                <?= $peserta['status_verifikasi'] === 'Verified' ? 'Edit Verifikasi' : 'Verifikasi Peserta' ?>
+                                                            </h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                         </div>
                                                         <form action="process/verifikasi_process.php" method="POST">
@@ -179,15 +197,17 @@ try {
                                                                 
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Jarak ke Sekolah (KM)</label>
-                                                                    <input type="number" step="0.1" class="form-control" name="jarak" required>
+                                                                    <input type="number" step="0.1" class="form-control" name="jarak" 
+                                                                           value="<?= htmlspecialchars($peserta['jarak_ke_sekolah'] ?? '') ?>" required>
                                                                 </div>
 
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Status Verifikasi</label>
-                                                                    <select class="form-select" name="status_verifikasi" id="statusVerifikasi<?= $peserta['id'] ?>" onchange="togglePengumumanStatus(<?= $peserta['id'] ?>)" required>
-                                                                        <option value="Pending">Pending</option>
-                                                                        <option value="Verified">Verified</option>
-                                                                        <option value="Rejected">Rejected</option>
+                                                                    <select class="form-select" name="status_verifikasi" id="statusVerifikasi<?= $peserta['id'] ?>" 
+                                                                            onchange="togglePengumumanStatus(<?= $peserta['id'] ?>)" required>
+                                                                        <option value="Pending" <?= $peserta['status_verifikasi'] === 'Pending' ? 'selected' : '' ?>>Pending</option>
+                                                                        <option value="Verified" <?= $peserta['status_verifikasi'] === 'Verified' ? 'selected' : '' ?>>Verified</option>
+                                                                        <option value="Rejected" <?= $peserta['status_verifikasi'] === 'Rejected' ? 'selected' : '' ?>>Rejected</option>
                                                                     </select>
                                                                 </div>
 
@@ -202,7 +222,7 @@ try {
 
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Catatan</label>
-                                                                    <textarea class="form-control" name="catatan" rows="3"></textarea>
+                                                                    <textarea class="form-control" name="catatan" rows="3"><?= htmlspecialchars($peserta['catatan'] ?? '') ?></textarea>
                                                                 </div>
                                                             </div>
                                                             <div class="modal-footer">
