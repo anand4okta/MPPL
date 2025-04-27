@@ -23,7 +23,8 @@ if(empty($_SESSION['user'])) {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT p.*, j.nama_jalur, v.status_verifikasi
+    // Tambahkan v.catatan ke query
+    $stmt = $pdo->prepare("SELECT p.*, j.nama_jalur, v.status_verifikasi, v.catatan
                           FROM peserta p 
                           LEFT JOIN jalur_pendaftaran j ON p.jalur_id = j.id
                           LEFT JOIN verifikasi_peserta v ON p.id = v.peserta_id 
@@ -222,6 +223,22 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <p class="mb-1"><strong>Tanggal Daftar:</strong> <?= date('d/m/Y', strtotime($peserta['created_at'])) ?></p>
                                 </div>
                             </div>
+
+                            <?php if(!empty($peserta['catatan'])): ?>
+                            <div class="mt-3">
+                                <div class="alert alert-warning mb-0">
+                                    <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Catatan dari Admin:</h6>
+                                    <p class="mb-0"><?= nl2br(htmlspecialchars($peserta['catatan'])) ?></p>
+                                    <?php if($status === 'rejected'): ?>
+                                    <hr>
+                                    <small class="text-danger">
+                                        <i class="bi bi-info-circle"></i> 
+                                        Silakan perbaiki data sesuai catatan di atas dan lengkapi dokumen yang diminta
+                                    </small>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
                         </div>
 
                         <?php if($status === 'Verified'): ?>
@@ -666,7 +683,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     body: formData
                                 })
                                 .then(response => response.json())
-                                .then(result => {
+                                .then(async result => {  // tambahkan async di sini
                                     if (result.success) {
                                         // Show success alert first
                                         await Swal.fire({
