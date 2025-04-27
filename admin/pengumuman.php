@@ -170,46 +170,60 @@ try {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-async function confirmStatus(e, action) {
-    e.preventDefault();
-    
-    const result = await Swal.fire({
-        title: `${action === 'terima' ? 'Terima' : 'Tolak'} Peserta?`,
-        text: `Yakin ingin ${action === 'terima' ? 'menerima' : 'menolak'} peserta ini?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: action === 'terima' ? '#28a745' : '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: `Ya, ${action === 'terima' ? 'Terima' : 'Tolak'}!`,
-        cancelButtonText: 'Batal'
-    });
+    async function confirmStatus(e, action) {
+        e.preventDefault();
+        
+        const result = await Swal.fire({
+            title: `${action === 'terima' ? 'Terima' : 'Tolak'} Peserta?`,
+            text: `Yakin ingin ${action === 'terima' ? 'menerima' : 'menolak'} peserta ini?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: action === 'terima' ? '#28a745' : '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: `Ya, ${action === 'terima' ? 'Terima' : 'Tolak'}!`,
+            cancelButtonText: 'Batal'
+        });
 
-    if (result.isConfirmed) {
-        window.location.href = e.target.href;
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: `Peserta berhasil ${action === 'terima' ? 'diterima' : 'ditolak'}`,
+                icon: 'success',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                willClose: () => {
+                    window.location.href = e.target.href;
+                }
+            });
+            return false;
+        }
+        return false;
     }
-    return false;
-}
 
-// Replace existing alerts with SweetAlert
-window.addEventListener('load', function() {
-    <?php if(isset($_SESSION['success'])): ?>
-        Swal.fire({
-            title: 'Berhasil!',
-            text: '<?= $_SESSION['success'] ?>',
-            icon: 'success',
-            timer: 1500,
-            showConfirmButton: false
-        });
-    <?php unset($_SESSION['success']); endif; ?>
+    window.addEventListener('load', function() {
+        <?php if(isset($_SESSION['success'])): ?>
+            Swal.fire({
+                title: 'Berhasil!',
+                text: '<?= $_SESSION['success'] ?>',
+                icon: 'success',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                willClose: () => {
+                    window.location.href = 'pengumuman.php';
+                }
+            });
+        <?php unset($_SESSION['success']); endif; ?>
 
-    <?php if(isset($_SESSION['error'])): ?>
-        Swal.fire({
-            title: 'Error!',
-            text: '<?= $_SESSION['error'] ?>',
-            icon: 'error'
-        });
-    <?php unset($_SESSION['error']); endif; ?>
-});
-</script>
+        <?php if(isset($_SESSION['error'])): ?>
+            Swal.fire({
+                title: 'Error!',
+                text: '<?= $_SESSION['error'] ?>',
+                icon: 'error'
+            });
+        <?php unset($_SESSION['error']); endif; ?>
+    });
+    </script>
 </body>
 </html>
