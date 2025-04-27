@@ -61,46 +61,42 @@ Selamat datang di portal PPDB Online MAN 1 Musi Rawas! Kami sangat antusias meny
 
 ## 👨‍💼 Panduan untuk Admin
 
-### 🔍 1. Verifikasi Data Siswa
+### 🔍 1. Manajemen Data Siswa
 1. Login sebagai admin
-2. Buka menu "Data Peserta"
-3. Gunakan fitur pencarian untuk mencari siswa:
+2. Akses melalui menu:
+   - "Verifikasi" - untuk verifikasi data baru/pending
+   - "Peserta" - untuk melihat semua data peserta
+   - "Pengumuman" - untuk manajemen pengumuman
+3. Fitur pencarian di setiap halaman:
    - Cari berdasarkan nama
    - Cari berdasarkan NISN
-   - Sistem akan menampilkan peringatan jika ada nama yang mirip
-4. Klik "Lihat Detail" pada siswa
-5. Periksa kelengkapan data:
-   - Biodata siswa dan orangtua
-   - Dokumen (KK, Akte, Foto, Raport)
-   - Prestasi (jika ada)
+4. Pengurutan data otomatis:
+   - Siswa terverifikasi ditampilkan paling atas
+   - Diikuti status pending dan ditolak
+   - Berdasarkan urutan pendaftaran (terlama ke terbaru)
 
-### 📏 2. Input Jarak & Verifikasi
-1. Buka menu "Verifikasi"
-2. Input jarak siswa ke sekolah (dalam kilometer)
-3. Pilih status verifikasi:
-   - Verified (memungkinkan input status penerimaan)
-   - Pending (menunggu kelengkapan)
-   - Rejected (ditolak dengan catatan)
-4. Jika status Verified, bisa langsung input status penerimaan:
-   - Diterima
-   - Ditolak
-5. Tambahkan catatan verifikasi jika perlu
+### 📏 2. Verifikasi & Catatan
+1. Klik tombol "Verifikasi" atau "Edit"
+2. Input/edit data verifikasi:
+   - Jarak ke sekolah (dalam kilometer)
+   - Status verifikasi (Verified/Pending/Rejected)
+   - Status penerimaan (untuk status Verified)
+3. Sistem manajemen catatan:
+   - Tambah catatan untuk setiap verifikasi
+   - Catatan wajib untuk status Rejected
+   - Catatan akan muncul di dashboard siswa
+   - Siswa dapat melihat & menindaklanjuti catatan
 
-### ⚙️ 3. Pengaturan Sistem
-1. **Jalur Pendaftaran**
-   - Set tanggal buka/tutup
-   - Atur kuota per jalur
-   - Set tanggal pengumuman
-
-2. **Pengumuman Kelulusan**
-   - Pilih status (Diterima/Ditolak)
-   - Input catatan tambahan
-   - Publish pengumuman
-
-3. **Export Data** 📊
-   - Export data siswa
-   - Format Excel (.xls)
-   - Filter berdasarkan status
+### 📊 3. Dashboard Admin
+1. Statistik pendaftaran:
+   - Total pendaftar
+   - Jumlah terverifikasi
+   - Jumlah pending
+   - Jumlah ditolak
+2. Monitoring status:
+   - Quick view status verifikasi
+   - Tracking progress pendaftaran
+   - Alert untuk pendaftar baru
 
 ## 🎨 Fitur Menarik
 
@@ -112,13 +108,13 @@ Selamat datang di portal PPDB Online MAN 1 Musi Rawas! Kami sangat antusias meny
 - 👥 Profile lengkap
 
 ### Untuk Admin
-- 📊 Statistik jumlah pendaftar
-- 📝 Verifikasi berkas pendaftar dengan validasi ganda
-- 🔍 Deteksi nama mirip untuk menghindari pendaftaran ganda
-- 📈 Status pendaftaran (Pending/Verified/Rejected)
-- 🎯 Status penerimaan terintegrasi dengan verifikasi
-- 📩 Export data ke Excel
-- ⚡ Manajemen pengumuman
+- 📊 Statistik real-time pendaftar
+- 📝 Sistem verifikasi dengan catatan
+- 🔍 Pencarian dan filter canggih
+- 📈 Pengurutan status otomatis
+- 🎯 Tracking progress pendaftaran
+- 📩 Export data lengkap
+- ⚡ Manajemen pengumuman terintegrasi
 
 ## 💡 Tips Penggunaan
 1. Siapkan scan dokumen yang jelas
