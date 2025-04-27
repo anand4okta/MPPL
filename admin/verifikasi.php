@@ -39,15 +39,15 @@ try {
         $params[':searchNisn'] = $searchLike;
     }
 
-    // Update the ORDER BY clause to show verified first, then order by registration date
+    // Perbaikan query ORDER BY yang sama
     $query .= " ORDER BY 
-                CASE 
-                    WHEN v.status_verifikasi = 'Verified' THEN 1 
-                    WHEN v.status_verifikasi = 'Pending' THEN 2
-                    WHEN v.status_verifikasi = 'rejected' THEN 3
+                CASE v.status_verifikasi
+                    WHEN 'Verified' THEN 1 
+                    WHEN 'Pending' THEN 2
+                    WHEN 'rejected' THEN 3
                     ELSE 4 
                 END,
-                p.created_at ASC"; // Changed to ASC to show earliest registrations first
+                p.created_at DESC";
     
     $stmt = $pdo->prepare($query);
     
