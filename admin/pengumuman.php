@@ -146,18 +146,16 @@ try {
                                             </span>
                                         </td>
                                         <td>
-                                            <div class="btn-group">
-                                                <a href="process/process_pengumuman.php?id=<?= $peserta['id'] ?>&status=diterima" 
-                                                   class="btn btn-sm btn-success"
-                                                   onclick="return confirmStatus(event, 'terima')">
-                                                    <i class="bi bi-check-circle"></i> Terima
-                                                </a>
-                                                <a href="process/process_pengumuman.php?id=<?= $peserta['id'] ?>&status=ditolak" 
-                                                   class="btn btn-sm btn-danger"
-                                                   onclick="return confirmStatus(event, 'tolak')">
-                                                    <i class="bi bi-x-circle"></i> Tolak
-                                                </a>
-                                            </div>
+                                            <a href="process/process_pengumuman.php?id=<?= $peserta['id'] ?>&status=diterima" 
+                                               class="btn btn-sm btn-success mb-2 mb-md-0 me-md-2"
+                                               onclick="return confirmStatus(event, 'terima')">
+                                                <i class="bi bi-check-circle"></i> Terima
+                                            </a>
+                                            <a href="process/process_pengumuman.php?id=<?= $peserta['id'] ?>&status=ditolak" 
+                                               class="btn btn-sm btn-danger"
+                                               onclick="return confirmStatus(event, 'tolak')">
+                                                <i class="bi bi-x-circle"></i> Tolak
+                                            </a>
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
