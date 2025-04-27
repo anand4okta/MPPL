@@ -12,21 +12,36 @@ try {
     $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
     // Base query
-    $query = "SELECT p.*, jp.nama_jalur, v.status_verifikasi 
-        FROM peserta p 
-        LEFT JOIN jalur_pendaftaran jp ON jp.id = p.jalur_id
-        LEFT JOIN verifikasi_peserta v ON p.id = v.peserta_id";
+    $query = "SELECT 
+                p.*,
+                v.status_verifikasi,
+                v.catatan,
+                jp.nama_jalur,
+                DATE_FORMAT(p.created_at, '%d/%m/%Y') as tanggal_daftar
+            FROM peserta p 
+            LEFT JOIN jalur_pendaftaran jp ON jp.id = p.jalur_id
+            LEFT JOIN verifikasi_peserta v ON p.id = v.peserta_id 
+            WHERE 1=1";
 
     $params = array();
     if (!empty($search)) {
         // Handle both name and NISN search
         $searchLike = '%' . strtolower($search) . '%';
-        $query .= " WHERE LOWER(p.nama_lengkap) LIKE :searchName OR p.nisn LIKE :searchNisn";
+        $query .= " AND (LOWER(p.nama_lengkap) LIKE :searchName 
+                        OR p.nisn LIKE :searchNisn)";
         $params[':searchName'] = $searchLike;
         $params[':searchNisn'] = $searchLike;
     }
 
-    $query .= " ORDER BY p.created_at DESC";
+    // Update ORDER BY to show verified first, then by registration date
+    $query .= " ORDER BY 
+                CASE 
+                    WHEN v.status_verifikasi = 'Verified' THEN 1 
+                    WHEN v.status_verifikasi = 'Pending' THEN 2
+                    WHEN v.status_verifikasi = 'rejected' THEN 3
+                    ELSE 4 
+                END,
+                p.created_at ASC";
     
     $stmt = $pdo->prepare($query);
     foreach ($params as $key => $val) {
