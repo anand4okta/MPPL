@@ -654,7 +654,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                             }
                             return false;
                         }
-                        // Ganti bagian script upload dengan yang lebih sederhana
+
+                        // Simplified form submission
                         const uploadForm = document.getElementById('uploadForm');
                         if (uploadForm) {
                             uploadForm.addEventListener('submit', function(e) {
@@ -683,48 +684,42 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     body: formData
                                 })
                                 .then(response => response.json())
-                                .then(async result => {  // tambahkan async di sini
+                                .then(result => {
                                     if (result.success) {
-                                        // Show success alert first
-                                        await Swal.fire({
-                                            icon: 'success',
-                                            title: 'Berhasil!',
-                                            text: 'Data berhasil disimpan',
-                                            confirmButtonColor: '#28a745',
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            showConfirmButton: false,
-                                            didOpen: () => {
-                                                Swal.showLoading();
-                                            }
-                                        });
-                                        
-                                        // Add extra delay before redirect
-                                        await new Promise(resolve => setTimeout(resolve, 500));
-                                        window.location.href = 'profile.php';
+                                        window.location.href = 'dashboard.php?success=1';
                                     } else {
-                                        throw new Error(result.message || 'Gagal menyimpan data');
+                                        window.location.href = 'dashboard.php?error=1';
                                     }
                                 })
                                 .catch(error => {
-                                    console.error('Error:', error);
-                                    // Show error alert
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error!',
-                                        text: error.message || 'Terjadi kesalahan saat menyimpan data',
-                                        confirmButtonColor: '#dc3545'
-                                    });
+                                    window.location.href = 'dashboard.php?error=1';
                                 });
                             });
                         }
 
-                        // Cek parameter success sekali saja saat load
+                        // Handle URL parameters for alerts
                         window.addEventListener('load', function() {
                             const urlParams = new URLSearchParams(window.location.search);
+                            
                             if (urlParams.has('success')) {
-                                alert('Data berhasil disimpan');
-                                history.replaceState(null, '', 'dashboard.php');
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: 'Data berhasil disimpan',
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    // Hapus parameter dari URL tanpa reload
+                                    window.history.replaceState({}, '', 'dashboard.php');
+                                });
+                            } else if (urlParams.has('error')) {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'Terjadi kesalahan saat menyimpan data',
+                                    icon: 'error'
+                                }).then(() => {
+                                    window.history.replaceState({}, '', 'dashboard.php');
+                                });
                             }
                         });
                         </script>
