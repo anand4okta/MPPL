@@ -23,7 +23,6 @@ if(empty($_SESSION['user'])) {
 }
 
 try {
-    // Tambahkan v.catatan ke query
     $stmt = $pdo->prepare("SELECT p.*, j.nama_jalur, v.status_verifikasi, v.catatan
                           FROM peserta p 
                           LEFT JOIN jalur_pendaftaran j ON p.jalur_id = j.id
@@ -31,6 +30,31 @@ try {
                           WHERE p.id = ?");
     $stmt->execute([$_SESSION['user']['id']]);
     $peserta = $stmt->fetch();
+
+    // Add file completeness check
+    $missing_files = [];
+    $folder_name = str_replace(' ', '_', strtolower($peserta['nama_lengkap']));
+
+    // Check required files
+    $required_files = [
+        'file_kk' => 'Kartu Keluarga',
+        'file_akte' => 'Akte Kelahiran',
+        'file_photo' => 'Pas Foto'
+    ];
+
+    foreach($required_files as $field => $label) {
+        if(empty($peserta[$field]) || !file_exists("File/{$folder_name}/{$peserta[$field]}")) {
+            $missing_files[] = $label;
+        }
+    }
+
+    // Check Raport
+    for($i = 1; $i <= 5; $i++) {
+        $field_name = "file_raport_" . $i;
+        if(empty($peserta[$field_name]) || !file_exists("File/{$folder_name}/{$peserta[$field_name]}")) {
+            $missing_files[] = "Raport Semester " . $i;
+        }
+    }
 
     // Get prestasi
     $stmt = $pdo->prepare("SELECT * FROM prestasi WHERE peserta_id = ? ORDER BY created_at DESC");
@@ -185,6 +209,44 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if(isset($_SESSION['success'])): ?>
             <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success']) ?></div>
             <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
+        <!-- Check file completeness -->
+        <?php
+        $missing_files = [];
+        $folder_name = str_replace(' ', '_', strtolower($peserta['nama_lengkap']));
+
+        // Check required files
+        $required_files = [
+            'file_kk' => 'Kartu Keluarga',
+            'file_akte' => 'Akte Kelahiran',
+            'file_photo' => 'Pas Foto'
+        ];
+
+        foreach($required_files as $field => $label) {
+            if(empty($peserta[$field]) || !file_exists("File/{$folder_name}/{$peserta[$field]}")) {
+                $missing_files[] = $label;
+            }
+        }
+
+        // Check Raport
+        for($i = 1; $i <= 5; $i++) {
+            $field_name = "file_raport_" . $i;
+            if(empty($peserta[$field_name]) || !file_exists("File/{$folder_name}/{$peserta[$field_name]}")) {
+                $missing_files[] = "Raport Semester " . $i;
+            }
+        }
+
+        if(!empty($missing_files)): ?>
+            <div class="alert alert-warning">
+                <h5 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Perhatian!</h5>
+                <p class="mb-0">Silakan lengkapi berkas-berkas berikut:</p>
+                <ul class="mb-0">
+                    <?php foreach($missing_files as $file): ?>
+                        <li><?= htmlspecialchars($file) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
         <?php endif; ?>
 
         <div class="row">
