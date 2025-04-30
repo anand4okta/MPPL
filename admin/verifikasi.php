@@ -18,6 +18,14 @@ try {
                 p.nama_lengkap,
                 p.created_at,
                 p.jarak_ke_sekolah,
+                p.file_kk,
+                p.file_akte,
+                p.file_photo,
+                p.file_raport_1,
+                p.file_raport_2,
+                p.file_raport_3,
+                p.file_raport_4,
+                p.file_raport_5,
                 jp.nama_jalur, 
                 v.status_verifikasi,
                 v.catatan,
@@ -71,6 +79,42 @@ try {
         $count = count($pending_verifications);
         $searchMessage = "Ditemukan {$count} hasil pencarian untuk \"{$search}\"";
     }
+
+    foreach($pending_verifications as &$peserta) {
+        $missing_files = [];
+        $folder_name = str_replace(' ', '_', strtolower($peserta['nama_lengkap']));
+        
+        // Check KK
+        if(empty($peserta['file_kk']) || !file_exists("../File/{$folder_name}/{$peserta['file_kk']}")) {
+            $missing_files[] = "Kartu Keluarga";
+        }
+        
+        // Check Akte
+        if(empty($peserta['file_akte']) || !file_exists("../File/{$folder_name}/{$peserta['file_akte']}")) {
+            $missing_files[] = "Akte Kelahiran";
+        }
+        
+        // Check Photo
+        if(empty($peserta['file_photo']) || !file_exists("../File/{$folder_name}/{$peserta['file_photo']}")) {
+            $missing_files[] = "Pas Foto";
+        }
+        
+        // Check Raport
+        for($i = 1; $i <= 5; $i++) {
+            $field_name = "file_raport_" . $i;
+            if(empty($peserta[$field_name]) || !file_exists("../File/{$folder_name}/{$peserta[$field_name]}")) {
+                $missing_files[] = "Raport Semester " . $i;
+            }
+        }
+        
+        // Set automatic note based on missing files
+        if (!empty($missing_files)) {
+            $peserta['auto_note'] = "Silakan lengkapi berkas berikut:\n- " . implode("\n- ", $missing_files);
+        } else {
+            $peserta['auto_note'] = "";
+        }
+    }
+    unset($peserta); // Break the reference
 
 } catch (PDOException $e) {
     error_log("Database error in verifikasi.php: " . $e->getMessage());
@@ -222,7 +266,14 @@ try {
 
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Catatan</label>
-                                                                    <textarea class="form-control" name="catatan" rows="3"><?= htmlspecialchars($peserta['catatan'] ?? '') ?></textarea>
+                                                                    <?php if (!empty($peserta['auto_note'])): ?>
+                                                                        <div class="alert alert-warning">
+                                                                            <strong>Berkas yang belum lengkap:</strong><br>
+                                                                            <?= nl2br(htmlspecialchars($peserta['auto_note'])) ?>
+                                                                        </div>
+                                                                    <?php endif; ?>
+
+                                                                    <textarea class="form-control" name="catatan" rows="3"><?= htmlspecialchars($peserta['catatan'] ?? $peserta['auto_note'] ?? '') ?></textarea>
                                                                 </div>
                                                             </div>
                                                             <div class="modal-footer">
@@ -293,21 +344,23 @@ try {
             });
         });
 
-        // Replace URL parameter check with SweetAlert
         window.addEventListener('load', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            if (urlParams.has('success')) {
+            <?php if(isset($_SESSION['verifikasi_success'])): ?>
                 Swal.fire({
                     title: 'Berhasil!',
-                    text: 'Status verifikasi berhasil diperbarui',
+                    text: '<?= $_SESSION['verifikasi_success'] ?>',
                     icon: 'success',
                     timer: 1500,
                     showConfirmButton: false
                 }).then(() => {
                     window.location.href = 'verifikasi.php';
                 });
-            } else if (urlParams.has('error')) {
+                <?php unset($_SESSION['verifikasi_success']); ?>
+            <?php endif; ?>
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.has('error')) {
                 Swal.fire({
                     title: 'Error!',
                     text: 'Terjadi kesalahan saat memproses verifikasi',
