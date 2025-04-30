@@ -45,8 +45,10 @@ try {
     // Generate automatic note if files are missing
     $auto_note = !empty($missing_files) ? "Silakan lengkapi berkas berikut:\n- " . implode("\n- ", $missing_files) : "";
     
-    // Use admin's manual note if provided, otherwise use auto note
-    $final_note = !empty($_POST['catatan']) ? $_POST['catatan'] : $auto_note;
+    // Use admin's manual note if provided
+    // If no manual note and no missing files, leave it empty
+    $final_note = !empty($_POST['catatan']) ? $_POST['catatan'] : 
+                  (!empty($missing_files) ? $auto_note : "");
 
     // Check if verification record exists
     $stmt = $pdo->prepare("SELECT id FROM verifikasi_peserta WHERE peserta_id = ?");
