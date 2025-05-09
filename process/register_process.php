@@ -88,11 +88,26 @@ try {
     $pdo->beginTransaction();
 
     try {
-        // Cek duplikasi NISN
-        $stmt = $pdo->prepare("SELECT id FROM peserta WHERE nisn = ?");
-        $stmt->execute([$nisn]);
-        if ($stmt->fetch()) {
-            throw new Exception("NISN sudah terdaftar!");
+        // Cek duplikasi NISN dan nama (case insensitive)
+        $stmt = $pdo->prepare("
+            SELECT p.id, p.nama_lengkap, p.nisn, j.nama_jalur 
+            FROM peserta p 
+            LEFT JOIN jalur_pendaftaran j ON p.jalur_id = j.id 
+            WHERE p.nisn = ? OR LOWER(p.nama_lengkap) = LOWER(?)
+        ");
+        $stmt->execute([$nisn, $nama]);
+        $existing = $stmt->fetch();
+        
+        if ($existing) {
+            $error_msg = "Maaf, ";
+            if (strtolower($existing['nama_lengkap']) === strtolower($nama)) {
+                $error_msg .= "nama {$existing['nama_lengkap']} ";
+            }
+            if ($existing['nisn'] === $nisn) {
+                $error_msg .= ($error_msg !== "Maaf, " ? "dengan " : "") . "NISN {$existing['nisn']} ";
+            }
+            $error_msg .= "sudah terdaftar di jalur {$existing['nama_jalur']}";
+            throw new Exception($error_msg);
         }
 
         // Hash password dengan cost yang sesuai
