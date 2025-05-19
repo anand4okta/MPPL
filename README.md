@@ -132,23 +132,32 @@ Selamat datang di portal PPDB Online MAN 1 Musi Rawas! Kami sangat antusias meny
 - Hubungi admin melalui WhatsApp jika ada kendala
 - Segera lakukan daftar ulang jika dinyatakan lulus
 
-## 🆕 Update Terbaru (30 April 2025 - 07:17 WIB)
+## 🆕 Update Terbaru (19 Mei 2025 - 09:45 WIB)
 
 ### 🛠 Perbaikan
-- Fixed: Masalah duplikasi catatan verifikasi berkas
-- Fixed: Catatan berkas yang muncul saat dokumen sudah lengkap
-- Fixed: Tampilan alert status verifikasi yang berulang
+- Fixed: Masalah foto profil yang tidak terupdate setelah upload
+- Fixed: Duplikasi data prestasi saat input berulang
+- Fixed: Validasi form prestasi yang tidak konsisten
+- Fixed: Perhitungan jarak ke sekolah yang tidak akurat
 
 ### 💡 Peningkatan
-1. **Sistem Verifikasi Berkas**
-   - Pengecekan berkas lebih akurat
-   - Catatan otomatis lebih bersih
-   - Status file lebih informatif
+1. **Manajemen File**
+   - Cache foto profil lebih optimal
+   - Sistem kompresi foto otomatis
+   - Preview file sebelum upload
+   - Validasi format & ukuran file yang lebih baik
 
-2. **UX Improvements**
-   - Alert status yang lebih konsisten
-   - Feedback verifikasi yang lebih jelas
-   - Pesan error yang lebih deskriptif
+2. **Input Prestasi**
+   - Form input yang lebih user-friendly
+   - Validasi data prestasi lebih ketat
+   - Pengelompokan prestasi lebih terstruktur
+   - Label opsional untuk jalur non-prestasi
+
+3. **Verifikasi Data**
+   - Status verifikasi real-time
+   - Notifikasi perubahan status
+   - Tracking berkas lebih detail
+   - Catatan verifikasi yang lebih informatif
 
 <div align="center">
   <p>💫 Selamat mendaftar dan sukses selalu! 💫</p>
