@@ -85,9 +85,10 @@ try {
                         <?php 
                         $folder_name = str_replace(' ', '_', strtolower($peserta['nama_lengkap'])); 
                         $photo_path = "File/{$folder_name}/{$peserta['file_photo']}";
+                        $timestamp = file_exists($photo_path) ? '?v=' . filemtime($photo_path) : '';
                         
                         if(!empty($peserta['file_photo']) && file_exists($photo_path)): ?>
-                            <img src="<?= htmlspecialchars($photo_path) ?>" 
+                            <img src="<?= htmlspecialchars($photo_path . $timestamp) ?>" 
                                  class="img-fluid rounded-circle mb-3" 
                                  style="width: 150px; height: 150px; object-fit: cover;"
                                  alt="Foto Profil"
