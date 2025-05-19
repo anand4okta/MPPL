@@ -119,10 +119,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if(isset($_POST['add_prestasi'])) {
-            $stmt = $pdo->prepare("INSERT INTO prestasi (peserta_id, bidang_prestasi, peringkat, tingkat) VALUES (?, ?, ?, ?)");
+            // Update query insert prestasi
+            $stmt = $pdo->prepare("INSERT INTO prestasi (peserta_id, bidang_prestasi, judul_prestasi, peringkat, tingkat) 
+                          VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([
                 $_SESSION['user']['id'],
                 $_POST['bidang_prestasi'],
+                $_POST['judul_prestasi'],
                 $_POST['peringkat'],
                 $_POST['tingkat']
             ]);
@@ -792,7 +795,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col-md-4">
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-success text-white">
-                        <h4 class="mb-0"><i class="bi bi-trophy"></i> Prestasi</h4>
+                        <h4 class="mb-0"><i class="bi bi-trophy"></i> Prestasi <small class="text-muted">(Opsional)</small></h4>
                     </div>
                     <div class="card-body">
                         <form method="post" class="mb-4" onsubmit="return handleAddPrestasi(event)">
@@ -801,17 +804,37 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                             
                             <div class="mb-3">
                                 <label>Bidang Prestasi</label>
-                                <input type="text" class="form-control" name="bidang_prestasi" required>
+                                <select class="form-select" name="bidang_prestasi" required>
+                                    <option value="">Pilih Bidang Prestasi</option>
+                                    <option value="Prestasi Akademik">Prestasi Akademik</option>
+                                    <option value="Prestasi Olahraga">Prestasi Olahraga</option>
+                                    <option value="Prestasi Seni">Prestasi Seni</option>
+                                    <option value="Prestasi Non-Akademik">Prestasi Non-Akademik</option>
+                                </select>
+                                <small class="text-muted">
+                                    <ul class="mt-1">
+                                        <li>Prestasi Akademik: nilai tinggi, penghargaan, beasiswa, kompetisi ilmiah</li>
+                                        <li>Prestasi Olahraga: juara kompetisi, rekor, medali</li>
+                                        <li>Prestasi Seni: juara lomba seni lukis, tari, musik, sastra</li>
+                                        <li>Prestasi Non-Akademik: ketua organisasi, berprestasi dalam lomba pidato, dll</li>
+                                    </ul>
+                                </small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Judul/Nama Prestasi</label>
+                                <input type="text" class="form-control" name="judul_prestasi" placeholder="Contoh: Juara 1 KSM Matematika" required>
                             </div>
 
                             <div class="mb-3">
                                 <label>Peringkat/Hasil</label>
-                                <input type="text" class="form-control" name="peringkat" required>
+                                <input type="text" class="form-control" name="peringkat" placeholder="Contoh: Juara 1, Medali Emas, dll" required>
                             </div>
 
                             <div class="mb-3">
                                 <label>Tingkat</label>
                                 <select class="form-select" name="tingkat" required>
+                                    <option value="">Pilih Tingkat</option>
                                     <option value="Kecamatan">Kecamatan</option>
                                     <option value="Kabupaten">Kabupaten</option>
                                     <option value="Provinsi">Provinsi</option>
@@ -835,6 +858,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <h6 class="mb-1"><?= htmlspecialchars($p['bidang_prestasi']) ?></h6>
+                                            <p class="mb-1"><?= htmlspecialchars($p['judul_prestasi']) ?></p>
                                             <small class="text-muted">
                                                 Peringkat: <?= htmlspecialchars($p['peringkat']) ?><br>
                                                 Tingkat: <?= htmlspecialchars($p['tingkat']) ?>
@@ -896,8 +920,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                 title: 'Berhasil!',
                 text: 'Prestasi berhasil ditambahkan',
                 timer: 1500,
-                showConfirmButton: false,
-                timerProgressBar: true
+                showConfirmButton: false
             }).then(() => {
                 window.location.reload();
             });
