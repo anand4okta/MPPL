@@ -61,8 +61,11 @@ try {
                     <div class="card-body text-center">
                         <?php 
                         // Pada bagian profil foto
-                        if(!empty($peserta['file_photo']) && file_exists("../File/{$folder_name}/{$peserta['file_photo']}")): ?>
-                            <img src="<?= "../File/{$folder_name}/{$peserta['file_photo']}" ?>" 
+                        $photo_path = "../File/{$folder_name}/{$peserta['file_photo']}";
+                        $timestamp = file_exists($photo_path) ? '?v=' . filemtime($photo_path) . '-' . uniqid() : '';
+                        
+                        if(!empty($peserta['file_photo']) && file_exists($photo_path)): ?>
+                            <img src="<?= htmlspecialchars($photo_path . $timestamp) ?>" 
                                  class="img-thumbnail mb-3" 
                                  style="max-width: 200px;" 
                                  alt="Foto Peserta"
