@@ -13,22 +13,11 @@ CREATE TABLE jalur_pendaftaran (
 -- Set timezone untuk session ini saja
 SET time_zone = '+07:00';
 
--- Update timestamp columns
-ALTER TABLE jalur_pendaftaran MODIFY created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE peserta MODIFY created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE peserta MODIFY updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE prestasi MODIFY created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE admin MODIFY created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP; 
-ALTER TABLE verifikasi_peserta MODIFY created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE verifikasi_peserta MODIFY updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE pengumuman MODIFY created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE pengumuman MODIFY updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP;
-
 -- Update insert statements with precise timestamps
 INSERT INTO jalur_pendaftaran (nama_jalur, kuota, tanggal_buka, tanggal_tutup, tanggal_pengumuman) VALUES
 ('Reguler', 30, '2025-03-01 00:00:00', '2025-05-31 23:59:59', '2025-06-01 08:00:00'),
 ('Prestasi', 30, '2025-04-01 00:00:00', '2025-04-30 23:59:59', '2025-05-01 08:00:00'),
-('Tahfidz', 20, '2025-04-01 00:00:00', '2025-06-30 23:59:59', '2025-07-01 08:00:00');
+('Tahfidz', 20, '2025-04-01 00:00:00', '2025-06-30 23:59:59', '2025-07-01 08:00:00'),
 ('Pondok Pesantren', 22, '2025-05-01 00:00:00', '2025-06-30 23:59:59', '2025-07-01 08:00:00'),
 ('Afirmasi', 8, '2025-05-01 00:00:00', '2025-06-30 23:59:59', '2025-07-01 08:00:00'),
 ('Domisili', 60, '2025-05-01 00:00:00', '2025-06-30 23:59:59', '2025-07-01 08:00:00');
